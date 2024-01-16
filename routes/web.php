@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FilmsController;
+use App\Http\Controllers\CinemaHallController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,7 +34,14 @@ Route::get('/admin/login', function () {
     return view('admin.login');
 });
 
-Route::resource('/admin/index', FilmsController::class);
+//Route::resource('/admin/index', FilmsController::class);
+
+
+Route::get('/admin/index', [FilmsController::class, 'index']);
+Route::get('/admin/index', [CinemaHallController::class, 'index']);
+Route::post('/admin/index', [CinemaHallController::class, 'store']);
+Route::delete('/admin/index/holls/{id}', [CinemaHallController::class, 'destroy']);
+
 
 /*Route::get('/admin/index', function () {
     return view('admin.index');

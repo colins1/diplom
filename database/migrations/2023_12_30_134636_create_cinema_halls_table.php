@@ -15,12 +15,13 @@ return new class extends Migration
     {
         Schema::create('cinema_halls', function (Blueprint $table) {
             $table->id();
-            $table->integer('hall_number');
-            $table->integer('number_of_seats');
-            $table->float('price_per_regular_seat');
-            $table->float('price_per_vip_seat');
-            $table->text('vip_seats')->nullable();
-            $table->text('unavailable_seats')->nullable();
+            $table->string('name');
+            $table->integer('hall_number')->nullable()->default(null);
+            $table->text('number_of_seats')->nullable()->default(null);
+            $table->float('price_per_regular_seat')->nullable()->default(null);
+            $table->float('price_per_vip_seat')->nullable()->default(null);
+            $table->integer('vip_seats')->nullable()->default(null);
+            $table->integer('unavailable_seats')->nullable()->default(null);
             $table->timestamps();
         });
     }

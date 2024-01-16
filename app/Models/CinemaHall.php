@@ -10,6 +10,7 @@ class CinemaHall extends Model
     use HasFactory;
     
     protected $fillable = [
+        'name',
         'hall_number',
         'number_of_seats',
         'price_per_regular_seat',

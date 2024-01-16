@@ -53,6 +53,7 @@
   .conf-step__button-trash {
     background-image: url("../i/trash-sprite.png");
     background-size: contain;
+    border: none;
     background-size: cover;
   }
 </style>
@@ -69,7 +70,7 @@
 
             </div>
             <div class="popup__wrapper">
-                <form accept-charset="utf-8" name="hallAddForm" id="hallAddForm">
+                <form accept-charset="utf-8" method="POST" action="{{ url('/admin/index') }}" name="hallAddForm" id="hallAddForm">
                     @csrf
                     <label class="conf-step__label conf-step__label-fullsize" for="name">
                         Название зала
@@ -86,7 +87,7 @@
 </div>
 
 {{--Popup delete Hall--}}
-<div class="popup" id="deletePopup">
+<div class="popup dellPopup" id="dellPopup">
   <div class="popup__container">
       <div class="popup__content">
           <div class="popup__header">
@@ -97,12 +98,13 @@
 
           </div>
           <div class="popup__wrapper">
-              <form accept-charset="utf-8" id="hallDeleteForm">
+              <form accept-charset="utf-8" method="POST" id="hallDeleteForm">
                   @csrf
+                  @method('DELETE')
                   <p class="conf-step__paragraph">Вы действительно хотите удалить зал <span class="popupHallName"></span>?</p>
                   <!-- В span будет подставляться название зала -->
                   <div class="conf-step__buttons text-center">
-                      <input type="submit" value="Удалить" class="conf-step__button conf-step__button-accent">
+                      <input type="submit" value="Удалить" class="conf-step__button conf-step__button-accent delholl deleteForm">
                       <button class="conf-step__button conf-step__button-regular">Отменить</button>
                   </div>
               </form>
@@ -233,14 +235,13 @@
       <div class="conf-step__wrapper">
         <p class="conf-step__paragraph">Доступные залы:</p>
         <ul class="conf-step__list">
-          <li>Зал 1
-            <button class="conf-step__button conf-step__button-trash"></button>
-          </li>
-          <li>Зал 2
-            <button class="conf-step__button conf-step__button-trash"></button>
-          </li>
+          @foreach ($cinemaHalls as $cinemaHall)
+            <li>Зал {{ $cinemaHall->name }}
+                <button idattr="{{ $cinemaHall->id }}" class="show-popup conf-step__button conf-step__button-trash hallDeleteForm dellPopup"></button>
+            </li>
+          @endforeach
         </ul>
-        <button class="show-popup conf-step__button conf-step__button-accent addPopup">Создать зал</button>
+        <button attr-id="" class="show-popup conf-step__button conf-step__button-accent addPopup">Создать зал</button>
       </div>
     </section>
     
@@ -251,14 +252,15 @@
       <div class="conf-step__wrapper">
         <p class="conf-step__paragraph">Выберите зал для конфигурации:</p>
         <ul class="conf-step__selectors-box">
-          <li><input type="radio" class="conf-step__radio" name="chairs-hall" value="Зал 1" checked><span class="conf-step__selector">Зал 1</span></li>
-          <li><input type="radio" class="conf-step__radio" name="chairs-hall" value="Зал 2"><span class="conf-step__selector">Зал 2</span></li>
+          @foreach ($cinemaHalls as $cinemaHall)
+            <li><input type="radio" class="conf-step__radio" name="chairs-hall" value="Зал 1" @if ($loop->first) checked @endif><span class="conf-step__selector">Зал {{$cinemaHall->name}}</span></li>
+          @endforeach
         </ul>
         <p class="conf-step__paragraph">Укажите количество рядов и максимальное количество кресел в ряду:</p>
         <div class="conf-step__legend">
-          <label class="conf-step__label">Рядов, шт<input type="text" class="conf-step__input" placeholder="10" ></label>
+          <label class="conf-step__label">Рядов, шт<input holl="{{$cinemaHall->id}}" id="rowsall" type="number" class="conf-step__input" value="10" ></label>
           <span class="multiplier">x</span>
-          <label class="conf-step__label">Мест, шт<input type="text" class="conf-step__input" placeholder="8" ></label>
+          <label class="conf-step__label">Мест, шт<input holl="{{$cinemaHall->id}}" id="seatsall" type="number" class="conf-step__input" value="8" ></label>
         </div>
         <p class="conf-step__paragraph">Теперь вы можете указать типы кресел на схеме зала:</p>
         <div class="conf-step__legend">
@@ -267,73 +269,77 @@
           <span class="conf-step__chair conf-step__chair_disabled"></span> — заблокированные (нет кресла)
           <p class="conf-step__hint">Чтобы изменить вид кресла, нажмите по нему левой кнопкой мыши</p>
         </div>  
-        
-        <div class="conf-step__hall">
-          <div class="conf-step__hall-wrapper">
-            <div class="conf-step__row">
+        @foreach ($cinemaHalls as $cinemaHall)
+        <div class="conf-step__hall"@if ($loop->first)
+                                    @else 
+                                    style="display: none;"
+                                    @endif
+                                    >
+          <div class="conf-step__hall-wrapper" holl="{{$cinemaHall->id}}">
+            <div class="start_check conf-step__row" holl="{{$cinemaHall->id}}">
               <span class="conf-step__chair conf-step__chair_disabled"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
               <span class="conf-step__chair conf-step__chair_disabled"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
               <span class="conf-step__chair conf-step__chair_disabled"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
             </div>  
 
-            <div class="conf-step__row">
+            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
               <span class="conf-step__chair conf-step__chair_disabled"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_disabled"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
             </div>  
 
-            <div class="conf-step__row">
+            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
               <span class="conf-step__chair conf-step__chair_disabled"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
             </div>  
 
-            <div class="conf-step__row">
+            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_vip"></span>
               <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
             </div>  
 
-            <div class="conf-step__row">
+            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_vip"></span>
               <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_vip"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
             </div>  
 
-            <div class="conf-step__row">
+            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_vip"></span>
               <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_vip"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
             </div>  
 
-            <div class="conf-step__row">
+            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_vip"></span>
               <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_vip"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
             </div>  
 
-            <div class="conf-step__row">
+            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
             </div>  
 
-            <div class="conf-step__row">
+            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
             </div>  
 
-            <div class="conf-step__row">
+            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
               <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
@@ -341,10 +347,11 @@
             </div>
           </div>  
         </div>
+        @endforeach
         
         <fieldset class="conf-step__buttons text-center">
           <button class="conf-step__button conf-step__button-regular">Отмена</button>
-          <input type="submit" value="Сохранить" class="conf-step__button conf-step__button-accent">
+          <input type="submit" value="Сохранить" class="conf-step__button conf-step__button-accent db_push">
         </fieldset>                 
       </div>
     </section>
@@ -482,9 +489,120 @@
         let classList = event.currentTarget.classList;
         let length = classList.length;
         lastClass = classList[length - 1];
+        idDel = classList[length - 2];
         $("#"+lastClass+", #popup-bg").show();
+        let id = event.currentTarget.attributes.idattr.value;
+        if (id) {
+          let act = '\/admin\/index\/holls\/'+id;
+          $("#" + lastClass).find("#" + idDel).attr("action", act);
+        }
       });
-    
+
+      $(".db_push").click(function() {
+        var data = [];
+        $('.conf-step__row').each(function() {
+            var row = [];
+            $(this).find('span').each(function() {
+                var chair = $(this).attr('class').split(' ')[1];
+                if (chair == 'conf-step__chair_disabled') {
+                    row.push([0, false]);
+                } else if (chair == 'conf-step__chair_standart') {
+                    row.push([1, false]);
+                } else if (chair == 'conf-step__chair_vip') {
+                    row.push([2, false]);
+                }
+            });
+            data.push(row);
+        });
+        //Отправка данных в базу !!!
+        var json_data = JSON.stringify(data);
+        $.post('url_адрес', {data: 'данные'}, function(response) {
+            console.log(response);
+        });
+      });
+
+
+      //Управление местами 
+      let chairClasses = ['conf-step__chair_disabled', 'conf-step__chair_standart', 'conf-step__chair_vip'];
+      let chairIndex = 0;
+      $('.conf-step__hall-wrapper').on('click', 'span.conf-step__chair', function() {
+        if ($(this).hasClass('conf-step__chair_vip')) {
+          $(this).removeClass('conf-step__chair_vip');
+          $(this).addClass('conf-step__chair_disabled');
+        } else if ($(this).hasClass('conf-step__chair_disabled')) {
+          $(this).removeClass('conf-step__chair_disabled');
+          $(this).addClass('conf-step__chair_standart');
+        } else {
+          $(this).removeClass('conf-step__chair_standart');
+          $(this).addClass('conf-step__chair_vip');
+        }
+      });
+
+      //Управление рядами
+      $('input#rowsall').on('input', function(e) {
+        let rows = parseInt($('input#rowsall:first').val());
+        if (isNaN(rows)) {
+          return;
+        }
+        if (rows < 1 || rows > 10) {
+          $('input#rowsall').attr('value', 8);
+          alert('Количество рядов и мест в ряде должно быть от 5 до 10');
+          return;
+        }
+        let step = $('.conf-step__row[data-attribute="'+e.target.attributes.holl.value+'"]');
+        let rowCount = step.length;
+
+        if (rowCount < rows) {
+            let lastRow = step.last();
+            let countToAdd = parseInt(rows) - parseInt(rowCount);
+
+            for (let i = 0; i < countToAdd; i++) {
+                lastRow.clone().appendTo('.conf-step__hall-wrapper');
+            }
+        } else if (rowCount > rows) {
+            let countToRemove = parseInt(rowCount) - parseInt(rows);
+
+            for (let i = 0; i < countToRemove; i++) {
+              $('.conf-step__hall-wrapper').children().last().remove();
+            }
+        }
+        
+      });
+
+      // управление местами в ряду
+      $('input#seatsall').on('input', function(e) {
+        let seats = parseInt($('input#seatsall:last').val());
+        if (isNaN(seats)) {
+          return;
+        }
+        if (seats < 1 || seats > 10) {
+          $('input#seatsall').attr('value', 8);
+          alert('Количество рядов и мест в ряде должно быть от 5 до 10');
+          return;
+        }
+
+        let stepCheck = $('div.start_check span.conf-step__chair[data-attribute="'+e.target.attributes.holl.value+'"]');
+        let rowCount = stepCheck.length;
+
+        let step = $('.conf-step__row');
+        if (rowCount < seats) {
+            let lastStep = step.children().last();
+            let countToAdd = parseInt(seats) - parseInt(rowCount);
+            step.each(function() {
+              for (let i = 0; i < countToAdd; i++) {
+                lastStep.clone().appendTo(this);
+              }
+            });
+        } else if (rowCount > seats) {
+          let countToRemove = parseInt(rowCount) - parseInt(seats);
+          step.each(function() {
+            for (let i = 0; i < countToRemove; i++) {
+              $(this).children().last().remove();
+            }
+          });
+        }
+      });
+      
       // Закрыть popup и фон при клике на крестик или вне popup
       $(".popup__dismiss, #popup-bg").click(function(e) {
         // Проверить, что клик был не внутри popup
