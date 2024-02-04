@@ -13,15 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('films', function (Blueprint $table) {
+        Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->default('');
-            $table->string('description')->default('');
-            $table->string('country')->default('');
-            $table->string('url_img')->default('');
-            $table->integer('minutes');
+            $table->integer('is_available')->default(0); // создаем булевый столбец с значением по умолчанию 0
             $table->timestamps();
         });
+
+        DB::table('tickets')->insert([
+            'is_available' => 0,
+        ]);
     }
 
     /**
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('films');
+        Schema::dropIfExists('tickets');
     }
 };

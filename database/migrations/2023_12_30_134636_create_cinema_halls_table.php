@@ -17,11 +17,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->integer('hall_number')->nullable()->default(null);
-            $table->text('number_of_seats')->nullable()->default(null);
-            $table->float('price_per_regular_seat')->nullable()->default(null);
-            $table->float('price_per_vip_seat')->nullable()->default(null);
+            $table->json('number_of_seats')->default('');
+            $table->integer('price_per_regular_seat')->nullable()->default(null);
+            $table->integer('price_per_vip_seat')->nullable()->default(null);
             $table->integer('vip_seats')->nullable()->default(null);
             $table->integer('unavailable_seats')->nullable()->default(null);
+            $table->integer('session_show')->default(0);
             $table->timestamps();
         });
     }

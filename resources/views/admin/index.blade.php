@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>ИдёмВКино</title>
@@ -10,7 +11,6 @@
   <link rel="stylesheet" href="{{ asset('css/admin/styles.css') }}">
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900&amp;subset=cyrillic,cyrillic-ext,latin-ext" rel="stylesheet">
 </head>
-
 <body>
   <div id="popup-bg"></div>
   <header class="page-header">
@@ -46,6 +46,8 @@
     /* Устанавливаем его z-index выше других элементов, чтобы он не перекрывался ими */
     z-index: 100;
   }
+
+  
   #addModalDismiss {
     height: 1.5em;
   }
@@ -78,7 +80,7 @@
                     </label>
                     <div class="conf-step__buttons text-center">
                         <input type="submit" value="Добавить зал" class="conf-step__button conf-step__button-accent" name="addHall">
-                        <button class="conf-step__button conf-step__button-regular">Отменить</button>
+                        <button class="conf-step__button conf-step__button-regular off-show">Отменить</button>
                     </div>
                 </form>
             </div>
@@ -105,7 +107,7 @@
                   <!-- В span будет подставляться название зала -->
                   <div class="conf-step__buttons text-center">
                       <input type="submit" value="Удалить" class="conf-step__button conf-step__button-accent delholl deleteForm">
-                      <button class="conf-step__button conf-step__button-regular">Отменить</button>
+                      <button class="conf-step__button conf-step__button-regular off-show">Отменить</button>
                   </div>
               </form>
           </div>
@@ -125,7 +127,7 @@
               </h2>
           </div>
           <div class="popup__wrapper">
-              <form accept-charset="utf-8" id="addMovieForm">
+              <form accept-charset="utf-8" enctype="multipart/form-data" id="addMovieForm" method="POST" action="{{ url('/admin/index/add_movie') }}">
                   @csrf
                   <label class="conf-step__label conf-step__label-fullsize" for="name">
                       Название фильма
@@ -144,8 +146,10 @@
                       <input class="conf-step__input" type="text" placeholder="Например, &laquo;Индия&raquo;" name="country" id="movieCountry" required>
                   </label>
                   <div class="conf-step__buttons text-center">
+                      <label for="addImg" class="conf-step__button conf-step__button-accent">Добавить Постер</label>
+                      <input type="file" id="addImg" name="addImg" style="display:none;">
                       <input type="submit" value="Добавить фильм" class="conf-step__button conf-step__button-accent" id="addMovieToDbBtn">
-                      <button class="conf-step__button conf-step__button-regular">Отменить</button>
+                      <button class="conf-step__button conf-step__button-regular off-show">Отменить</button>
                   </div>
               </form>
           </div>
@@ -167,31 +171,30 @@
 
           </div>
           <div class="popup__wrapper">
-              <form accept-charset="utf-8" id="seanceAddForm">
+              <form accept-charset="utf-8" method="POST" id="seanceAddForm" >
                   @csrf
                   <label class="conf-step__label conf-step__label-fullsize" for="hall_id">
                       Название зала
                       <select class="conf-step__input" name="hall_id" id="seance_hallName" required>
-                          {{--@foreach($halls as $hall)
-                          <option value="{{ $hall->id }}" selected>{{ $hall->name }}</option>
-                          @endforeach--}}
+                          @foreach($cinemaHalls as $cinemaHall)
+                          <option value="{{ $cinemaHall->id }}" class="chois-id">{{ $cinemaHall->name }}</option>
+                          @endforeach
                       </select>
                   </label>
                   <label class="conf-step__label conf-step__label-fullsize" for="name">
                       Время начала
-                      <input class="conf-step__input" type="time" value="00:00" name="start_time" id="seance_startTime" required>
+                      <input class="conf-step__input" type="time" min="10:00" max="22:00" name="start_time" id="seance_startTime" required>
                   </label>
-
-
                   <label class="conf-step__label conf-step__label-fullsize" for="movie_id">
                       Название фильма
-                  <input class="conf-step__input movie_name" type="text" placeholder="Например, &laquo;Альфа&raquo;" name="movie_name" id="seance_movieName" required>
+                      <select class="conf-step__input" name="movie_id" id="seance_movieName" required>
+                        <option value="" class="movie_id"></option>
+                      </select>
                   </label>
 
                   <div class="conf-step__buttons text-center">
-                      <input type="submit" value="Добавить" class="conf-step__button conf-step__button-accent">
-                      <button class="conf-step__button conf-step__button-regular">Отменить</button>
-                      <button type="button" class="conf-step__button conf-step__button-accent" id="movie_delete_btn">Удалить фильм</button>
+                      <input type="submit" value="Добавить" class="add-mov-seans conf-step__button conf-step__button-accent">
+                      <button class="conf-step__button conf-step__button-regular off-show">Отменить</button>
                   </div>
               </form>
           </div>
@@ -217,7 +220,7 @@
                   <!-- В span будет подставляться название фильма -->
                   <div class="conf-step__buttons text-center">
                       <input type="submit" value="Удалить" class="conf-step__button conf-step__button-accent">
-                      <button class="conf-step__button conf-step__button-regular">Отменить</button>
+                      <button class="conf-step__button conf-step__button-regular off-show">Отменить</button>
                   </div>
               </form>
           </div>
@@ -233,9 +236,10 @@
         <h2 class="conf-step__title">Управление залами</h2>
       </header>
       <div class="conf-step__wrapper">
-        <p class="conf-step__paragraph">Доступные залы:</p>
+        <p class="conf-step__paragraph">Доступные залы: </p>
         <ul class="conf-step__list">
           @foreach ($cinemaHalls as $cinemaHall)
+
             <li>Зал {{ $cinemaHall->name }}
                 <button idattr="{{ $cinemaHall->id }}" class="show-popup conf-step__button conf-step__button-trash hallDeleteForm dellPopup"></button>
             </li>
@@ -253,15 +257,21 @@
         <p class="conf-step__paragraph">Выберите зал для конфигурации:</p>
         <ul class="conf-step__selectors-box">
           @foreach ($cinemaHalls as $cinemaHall)
-            <li><input type="radio" class="conf-step__radio" name="chairs-hall" value="Зал 1" @if ($loop->first) checked @endif><span class="conf-step__selector">Зал {{$cinemaHall->name}}</span></li>
+            <li><input type="radio" class="conf-step__radio" holl="{{$cinemaHall->id}}" name="chairs-hall" value="Зал" @if ($loop->first) checked @endif><span class="conf-step__selector">Зал {{$cinemaHall->name}}</span></li>
           @endforeach
         </ul>
         <p class="conf-step__paragraph">Укажите количество рядов и максимальное количество кресел в ряду:</p>
-        <div class="conf-step__legend">
-          <label class="conf-step__label">Рядов, шт<input holl="{{$cinemaHall->id}}" id="rowsall" type="number" class="conf-step__input" value="10" ></label>
-          <span class="multiplier">x</span>
-          <label class="conf-step__label">Мест, шт<input holl="{{$cinemaHall->id}}" id="seatsall" type="number" class="conf-step__input" value="8" ></label>
-        </div>
+        @foreach ($cinemaHalls as $cinemaHall)
+          <div holl="{{$cinemaHall->id}}" class="conf-step__legend"
+                                    @if ($loop->first)
+                                    @else 
+                                    style="display: none;"
+                                    @endif>
+            <label class="conf-step__label">Рядов, шт<input holl="{{$cinemaHall->id}}" id="rowsall" type="number" class="conf-step__input" placeholder="10" ></label>
+            <span class="multiplier">x</span>
+            <label class="conf-step__label">Мест, шт<input holl="{{$cinemaHall->id}}" id="seatsall" type="number" class="conf-step__input" placeholder="8" ></label>
+          </div>
+        @endforeach
         <p class="conf-step__paragraph">Теперь вы можете указать типы кресел на схеме зала:</p>
         <div class="conf-step__legend">
           <span class="conf-step__chair conf-step__chair_standart"></span> — обычные кресла
@@ -274,85 +284,31 @@
                                     @else 
                                     style="display: none;"
                                     @endif
-                                    >
-          <div class="conf-step__hall-wrapper" holl="{{$cinemaHall->id}}">
-            <div class="start_check conf-step__row" holl="{{$cinemaHall->id}}">
-              <span class="conf-step__chair conf-step__chair_disabled"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
-              <span class="conf-step__chair conf-step__chair_disabled"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
-              <span class="conf-step__chair conf-step__chair_disabled"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
-            </div>  
-
-            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
-              <span class="conf-step__chair conf-step__chair_disabled"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_disabled"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
-            </div>  
-
-            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
-              <span class="conf-step__chair conf-step__chair_disabled"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
-            </div>  
-
-            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_vip"></span>
-              <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
-            </div>  
-
-            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_vip"></span>
-              <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_vip"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
-            </div>  
-
-            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_vip"></span>
-              <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_vip"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
-            </div>  
-
-            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_vip"></span>
-              <span class="conf-step__chair conf-step__chair_vip"></span><span class="conf-step__chair conf-step__chair_vip"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
-            </div>  
-
-            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_disabled"></span>
-            </div>  
-
-            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-            </div>  
-
-            <div class="conf-step__row" holl="{{$cinemaHall->id}}">
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>
-              <span class="conf-step__chair conf-step__chair_standart"></span><span class="conf-step__chair conf-step__chair_standart"></span>          
-            </div>
-          </div>  
+                                    holl="{{$cinemaHall->id}}">                 
+          <div class="conf-step__hall-wrapper" holl="{{$cinemaHall->id}}" >
+            @if (!$cinemaHall->number_of_seats)
+              <div class="start_check conf-step__row" holl="{{$cinemaHall->id}}">
+                <span class="conf-step__chair conf-step__chair_disabled"></span>
+              </div>
+            @else
+              @foreach ((array)$cinemaHall->number_of_seats as $row)
+                <div class="start_check conf-step__row" holl="{{$cinemaHall->id}}">
+                  @foreach ((array)$row as $spot)
+                    <span class="conf-step__chair conf-step__chair_{{ $spot[0] == 0 ? 'disabled' : ($spot[0] == 1 ? 'standart' : 'vip') }}"></span>
+                  @endforeach
+                </div>
+              @endforeach
+            @endif
+          </div>
         </div>
         @endforeach
         
-        <fieldset class="conf-step__buttons text-center">
-          <button class="conf-step__button conf-step__button-regular">Отмена</button>
-          <input type="submit" value="Сохранить" class="conf-step__button conf-step__button-accent db_push">
-        </fieldset>                 
+        <form method="POST" class="form_spot">
+          @csrf
+          <fieldset class="conf-step__buttons text-center">
+            <input type="submit" value="Сохранить" class="conf-step__button conf-step__button-accent db_push_spot">
+          </fieldset> 
+        </form>                
       </div>
     </section>
     
@@ -363,24 +319,38 @@
       <div class="conf-step__wrapper">
         <p class="conf-step__paragraph">Выберите зал для конфигурации:</p>
         <ul class="conf-step__selectors-box">
-          <li><input type="radio" class="conf-step__radio" name="prices-hall" value="Зал 1"><span class="conf-step__selector">Зал 1</span></li>
-          <li><input type="radio" class="conf-step__radio" name="prices-hall" value="Зал 2" checked><span class="conf-step__selector">Зал 2</span></li>
+          @foreach ($cinemaHalls as $cinemaHall)
+            <li><input prices-hall="{{$cinemaHall->id}}" type="radio" class="conf-step__radio" name="prices-hall" value="Зал" @if ($loop->first) checked @endif><span class="conf-step__selector">Зал {{$cinemaHall->name}}</span></li>
+          @endforeach
         </ul>
           
         <p class="conf-step__paragraph">Установите цены для типов кресел:</p>
-          <div class="conf-step__legend">
-            <label class="conf-step__label">Цена, рублей<input type="text" class="conf-step__input" placeholder="0" ></label>
-            за <span class="conf-step__chair conf-step__chair_standart"></span> обычные кресла
-          </div>  
-          <div class="conf-step__legend">
-            <label class="conf-step__label">Цена, рублей<input type="text" class="conf-step__input" placeholder="0" value="350"></label>
-            за <span class="conf-step__chair conf-step__chair_vip"></span> VIP кресла
-          </div>  
-        
-        <fieldset class="conf-step__buttons text-center">
-          <button class="conf-step__button conf-step__button-regular">Отмена</button>
-          <input type="submit" value="Сохранить" class="conf-step__button conf-step__button-accent">
-        </fieldset>  
+        <div class="present_price">
+          @foreach ($cinemaHalls as $cinemaHall)
+            <div prices-hall="{{$cinemaHall->id}}" class="conf-step__legend" 
+              @if ($loop->first)
+              @else 
+              style="display: none;"
+              @endif>
+              <label class="conf-step__label">Цена, рублей<input prices-hall="{{$cinemaHall->id}}" type="text" class="conf-step__input standart-spot" value="{{$cinemaHall->price_per_regular_seat}}" ></label>
+              за <span class="conf-step__chair conf-step__chair_standart"></span> обычные кресла
+            </div>  
+            <div prices-hall="{{$cinemaHall->id}}" class="conf-step__legend"
+              @if ($loop->first)
+              @else 
+              style="display: none;"
+              @endif>
+              <label class="conf-step__label">Цена, рублей<input prices-hall="{{$cinemaHall->id}}" type="text" class="conf-step__input vip-spot" value="{{$cinemaHall->price_per_vip_seat}}"></label>
+              за <span class="conf-step__chair conf-step__chair_vip"></span> VIP кресла
+            </div>  
+          @endforeach
+        </div>
+        <form method="POST" class="form_price">
+          @csrf
+          <fieldset class="conf-step__buttons text-center">
+            <input type="submit" value="Сохранить" class="conf-step__button conf-step__button-accent db_push_price">
+          </fieldset> 
+        </form> 
       </div>
     </section>
     
@@ -388,79 +358,78 @@
       <header class="conf-step__header conf-step__header_opened">
         <h2 class="conf-step__title">Сетка сеансов</h2>
       </header>
+
       <div class="conf-step__wrapper">
         <p class="conf-step__paragraph">
           <button class="show-popup conf-step__button conf-step__button-accent button__add-movie addMoviePopup">Добавить фильм</button>
         </p>
         <div class="conf-step__movies">
-          <div class="conf-step__movie">
-            <img class="conf-step__movie-poster" alt="poster" src="{{ asset('i/poster.png') }}">
-            <h3 class="conf-step__movie-title">Звёздные войны XXIII: Атака клонированных клонов</h3>
-            <p class="conf-step__movie-duration">130 минут</p>
-          </div>
-          
-          <div class="conf-step__movie">
-            <img class="conf-step__movie-poster" alt="poster" src="{{ asset('i/poster.png') }}">
-            <h3 class="conf-step__movie-title">Миссия выполнима</h3>
-            <p class="conf-step__movie-duration">120 минут</p>
-          </div>
-          
-          <div class="conf-step__movie">
-            <img class="conf-step__movie-poster" alt="poster" src="{{ asset('i/poster.png') }}">
-            <h3 class="conf-step__movie-title">Серая пантера</h3>
-            <p class="conf-step__movie-duration">90 минут</p>
-          </div>
-          
-          <div class="conf-step__movie">
-            <img class="conf-step__movie-poster" alt="poster" src="{{ asset('i/poster.png') }}">
-            <h3 class="conf-step__movie-title">Движение вбок</h3>
-            <p class="conf-step__movie-duration">95 минут</p>
-          </div>   
-          
-          <div class="conf-step__movie">
-            <img class="conf-step__movie-poster" alt="poster" src="{{ asset('i/poster.png') }}">
-            <h3 class="conf-step__movie-title">Кот Да Винчи</h3>
-            <p class="conf-step__movie-duration">100 минут</p>
-          </div>            
+          @foreach ($cinema_all as $cinema)
+            <div class="conf-step__movie">
+              <img class="conf-step__movie-poster" duration="{{$cinema->minutes}}" id_film="{{$cinema->id}}" alt="{{$cinema->name}}" src="{{ asset($cinema->url_img) }}">
+              <h3 class="conf-step__movie-title">{{$cinema->name}}</h3>
+              <p class="conf-step__movie-duration" duration="{{$cinema->minutes}}">{{$cinema->minutes}} минут</p>
+              <form action="{{ url('/admin/index/delfilm', ['id' => $cinema->id]) }}" method="post" name="dellfilm" id="dellfilm">
+                @csrf
+                <input style="width: 20%; position: absolute; top: 30px; left: 200px;" type="submit" value="Dell" class="conf-step__button-accent dellfilm" name="dellfilm">
+              </form>
+            </div>
+          @endforeach          
+        </div>
+        <div class="conf-step__seances" style="width: 100%">
+          @foreach ($cinemaHalls as $cinemaHall)
+            <div class="conf-step__seances-hall" style="width: 100%" id-holl-sessia="{{$cinemaHall->id}}">
+              <h3 class="conf-step__seances-title">Зал {{$cinemaHall->name}}</h3>
+              <div class="conf-step__seances-timeline" style="width: 100%">
+                @if ($sessions != '')
+                  @foreach ($sessions as $session)
+                    @if ($session->hall_id == $cinemaHall->id)
+                    <?php
+                      $start_time = strtotime('10:00');
+                      $end_time = strtotime('22:00');
+                      $time = strtotime($session->time);
+                      $max_left = 660;
+                      $left = ($time - $start_time) / ($end_time - $start_time) * $max_left;
+                    ?>
+                    <style>
+                      .show-del-session {
+                        display: none;
+                        position: absolute;
+                        background-color: gray;
+                        width: 100px;
+                        height: 60px;
+                        font-size: 12px;
+                        color: white;
+                        padding: 10px;
+                      }
+                      .conf-step__seances-movie:hover .show-del-session {
+                        display: block;
+                      }
+                    </style>
+                    <div class="conf-step__seances-movie" duration="{{$session->duration}}" id-holl-sessia="{{$cinemaHall->id}}" style="width: 115px; background-color: rgb(133, 255, 137); left: {{ $left }}px;">
+                      <p class="conf-step__seances-movie-title">{{$session->movie_name}}</p>
+                      <p class="conf-step__seances-movie-start" id-holl-sessia="{{$cinemaHall->id}}" duration="{{$session->duration}}">{{$session->time}}</p>
+                      <div class="show-del-session">
+                        <p>Удалить фильм из сетки?</p>
+                        
+                        <form action="{{ url('/admin/index/delfilmses', ['id' => $session->movie_id, 'mid' => $session->id_ses]) }}" method="post" name="dellfilmses" id="dellfilmses">
+                          @csrf
+                          <input style="width: 30%; position: absolute; top: 20px; left: 70px;" type="submit" value="Dell" class="conf-step__button-accent dellfilm" name="dellfilm">
+                        </form>
+                      </div>
+                    </div>
+                    @endif
+                  @endforeach
+                @endif
+              </div>
+            </div>
+          @endforeach
         </div>
         
-        <div class="conf-step__seances">
-          <div class="conf-step__seances-hall">
-            <h3 class="conf-step__seances-title">Зал 1</h3>
-            <div class="conf-step__seances-timeline">
-              <div class="conf-step__seances-movie" style="width: 60px; background-color: rgb(133, 255, 137); left: 0;">
-                <p class="conf-step__seances-movie-title">Миссия выполнима</p>
-                <p class="conf-step__seances-movie-start">00:00</p>
-              </div>
-              <div class="conf-step__seances-movie" style="width: 60px; background-color: rgb(133, 255, 137); left: 360px;">
-                <p class="conf-step__seances-movie-title">Миссия выполнима</p>
-                <p class="conf-step__seances-movie-start">12:00</p>
-              </div>
-              <div class="conf-step__seances-movie" style="width: 65px; background-color: rgb(202, 255, 133); left: 420px;">
-                <p class="conf-step__seances-movie-title">Звёздные войны XXIII: Атака клонированных клонов</p>
-                <p class="conf-step__seances-movie-start">14:00</p>
-              </div>              
-            </div>
-          </div>
-          <div class="conf-step__seances-hall">
-            <h3 class="conf-step__seances-title">Зал 2</h3>
-            <div class="conf-step__seances-timeline">
-              <div class="conf-step__seances-movie" style="width: 65px; background-color: rgb(202, 255, 133); left: 595px;">
-                <p class="conf-step__seances-movie-title">Звёздные войны XXIII: Атака клонированных клонов</p>
-                <p class="conf-step__seances-movie-start">19:50</p>
-              </div>
-              <div class="conf-step__seances-movie" style="width: 60px; background-color: rgb(133, 255, 137); left: 660px;">
-                <p class="conf-step__seances-movie-title">Миссия выполнима</p>
-                <p class="conf-step__seances-movie-start">22:00</p>
-              </div>              
-            </div>
-          </div>
-        </div>
-        
-        <fieldset class="conf-step__buttons text-center">
+        {{--<fieldset class="conf-step__buttons text-center">
           <button class="conf-step__button conf-step__button-regular">Отмена</button>
           <input type="submit" value="Сохранить" class="conf-step__button conf-step__button-accent">
-        </fieldset>  
+        </fieldset>  --}}
       </div>
     </section>
     
@@ -469,8 +438,10 @@
         <h2 class="conf-step__title">Открыть продажи</h2>
       </header>
       <div class="conf-step__wrapper text-center">
-        <p class="conf-step__paragraph">Всё готово, теперь можно:</p>
-        <button class="conf-step__button conf-step__button-accent">Открыть продажу билетов</button>
+        @foreach ($tickets as $ticket)
+        <p class="conf-step__paragraph">@if ($ticket->is_available == 1) Приостановить продажу билетов @else Если все готово можно открыть продажу билетов @endif</p>
+        <button class="conf-step__button conf-step__button-accent session-start"@if ($ticket->is_available == 1) sessionCheck="0" on="false"> Закрыть @else sessionCheck="1" on="true"> Открыть @endif продажу билетов</button>
+        @endforeach
       </div>
     </section>    
   </main>
@@ -481,11 +452,128 @@
 
   <script>
     $(document).ready(function() {
+
+      function checkSell() {
+        let sessionStart = $(".session-start").attr("on");
+        if (sessionStart == "false") {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      $('.dellfilm').click(function(event) {
+        if (checkSell()) {
+            alert("Редактирование разрешено только после отключения продаж билетов");
+            return false;
+        }
+      });
+
+      $('.add-mov-seans').click(function(event) {
+      if (checkSell()) {
+          alert("Редактирование разрешено только после отключения продаж билетов");
+          return false;
+      }
+      let startTime = $('#seance_startTime').val();
+      let duration = $(this).attr('duration');
+      let id_holl_sessia = $(this).attr('id-holl-sessia');
+      duration = Number(duration);
+      let endTime = addMinutes(startTime, duration + 15);
+
+      let isConflict = false; // Флаг для обнаружения конфликта времени [id-holl-sessia="'++'"]
+      $('.conf-step__seances-movie-start[id-holl-sessia="'+id_holl_sessia+'"]').each(function() {
+          let time = $(this).text(); // Получаем время из блока с фильмом
+          let movieDuration = $(this).attr('duration'); // Получаем продолжительность фильма
+
+          // Преобразуем время и продолжительность в числа (например, "15:30" -> 15.5)
+          let newFilmTimeStart = parseFloat(startTime.replace(':', '.'));
+          let newFilmTimeEnd = parseFloat(endTime.replace(':', '.'));
+          let difference = newFilmTimeEnd - newFilmTimeStart;
+          let movieTimeOldStart = parseFloat(time.replace(':', '.'));
+          let movieEndTimeOld = addMinutes(time, Number(movieDuration) + 15);
+          movieEndTimeOld = parseFloat(movieEndTimeOld.replace(':', '.'));
+
+          if(newFilmTimeStart > movieEndTimeOld || newFilmTimeStart < movieTimeOldStart - difference + 0.15)
+          {
+
+          } else {
+              isConflict = true;
+              event.preventDefault();
+              alert('На это время фильм уже существует, выбирите другое время.');
+              return false; // Прерываем цикл, так как есть конфликт
+          }
+      });
+    });
+
+    function addMinutes(time, minutes) {
+        // Разбиваем строку времени на часы и минуты
+        const [hours, minutesStr] = time.split(":");
+        
+        // Преобразуем минуты в числовой формат
+        const minutesNum = parseInt(minutesStr, 10);
+        
+        // Вычисляем новое время
+        const newDate = new Date(1970, 0, 1, parseInt(hours, 10), minutesNum);
+        newDate.setMinutes(newDate.getMinutes() + minutes);
+        
+        // Форматируем результат в формат "hh:mm"
+        const newHours = newDate.getHours().toString().padStart(2, "0");
+        const newMinutes = newDate.getMinutes().toString().padStart(2, "0");
+        
+        return `${newHours}:${newMinutes}`;
+    }
+
       // Скрыть popup и фон по умолчанию
       $(".popup, #popup-bg").hide();
-    
+
+      $('.conf-step__movie-poster').draggable({
+          revert: true
+      });
+
+      // Проверка сессии
+      $(".session-start").click(function(event) {
+        $.ajaxSetup({
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+        });
+        $.ajax({
+            url: '/admin/index/session/1',
+            type: 'POST',
+            data: {sessionCheck: event.currentTarget.attributes.sessionCheck.value}, 
+            contentType: 'application/x-www-form-urlencoded', 
+            success: function(response) {
+                alert('Все удачно сохранено');
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+              alert('Ошибка');
+            }
+        });
+      });
+
+      //Формирование сетки сеансов
+      $('.conf-step__seances-hall').droppable({
+          drop: function(event, ui) {
+              let idFilm = ui.draggable.attr('id_film');
+              let nameFilm = ui.draggable.attr('alt');
+              let idHollSessia = $(this).attr('id-holl-sessia');
+              $('.chois-id[value='+idHollSessia+']').attr("selected", true);
+              $('.movie_id').text(nameFilm);
+              $('.movie_id').attr("value", idFilm);
+              $('.add-mov-seans').attr("duration", ui.draggable.attr('duration'));
+              $('.add-mov-seans').attr("id-holl-sessia", idHollSessia);
+              $('#seanceAddForm').attr("action", '/admin/index/seans');
+              $("#addShowTimePopup").show();
+              $("#popup-bg").show();
+          }
+      });
+      
       // Показать popup и фон при клике на кнопку
       $(".show-popup").click(function() {
+        if (checkSell()) {
+          alert("Редактирование разрешено только после отключения продаж билетов");
+          return false;
+        }
         let classList = event.currentTarget.classList;
         let length = classList.length;
         lastClass = classList[length - 1];
@@ -498,12 +586,68 @@
         }
       });
 
-      $(".db_push").click(function() {
-        var data = [];
-        $('.conf-step__row').each(function() {
-            var row = [];
+      //Смена зала
+      $('.conf-step__radio[name="chairs-hall"]').click(function(e) {
+        // Получаем значение атрибута .conf-step__radio
+        $(this).attr('checked', true);
+        let hollValue = $(this).attr('holl');
+
+        // Находим все блоки с атрибутом holl
+        let blocks = $('[holl]');
+
+        // Перебираем все блоки и проверяем значение атрибута holl
+        blocks.each(function() {
+          let block = $(this);
+          let blockHollValue = block.attr('holl');
+
+          // Если значение атрибута holl соответствует значению .conf-step__radio, показываем блок
+          if (blockHollValue == hollValue) {
+            block.show();
+          } else {
+            if(block[0].localName != 'input') {
+              block.hide();
+            }
+          }
+        });
+      });
+
+      //Смена цен зала
+      $('.conf-step__radio[name="prices-hall"]').click(function(e) {
+        // Получаем значение атрибута .conf-step__radio
+        $(this).attr('checked', true);
+        let holl_id = $(this).attr('prices-hall');
+
+        // Находим все блоки с атрибутом prices-hall
+        let blocks = $('.present_price [prices-hall]');
+
+        // Перебираем все блоки и проверяем значение атрибута holl
+        blocks.each(function() {
+          let block = $(this);
+          let blockHollValue = block.attr('prices-hall');
+
+          // Если значение атрибута holl соответствует значению .conf-step__radio, показываем блок
+          if (blockHollValue == holl_id) {
+            block.show();
+          } else {
+            block.hide();
+          }
+        });
+      });
+
+      //Отправка данных в базу мест
+      $(".db_push_spot").click(function(e) {
+        if (checkSell()) {
+          alert("Редактирование разрешено только после отключения продаж билетов");
+          return false;
+        }
+        e.preventDefault();
+        let data = [];
+        let id_holl;
+        $('.conf-step__row:visible').each(function(i, block) {
+            let row = [];
+            id_holl = block.attributes.holl.value;
             $(this).find('span').each(function() {
-                var chair = $(this).attr('class').split(' ')[1];
+                let chair = $(this).attr('class').split(' ')[1];
                 if (chair == 'conf-step__chair_disabled') {
                     row.push([0, false]);
                 } else if (chair == 'conf-step__chair_standart') {
@@ -515,17 +659,72 @@
             data.push(row);
         });
         //Отправка данных в базу !!!
-        var json_data = JSON.stringify(data);
-        $.post('url_адрес', {data: 'данные'}, function(response) {
-            console.log(response);
+
+        let json_data = JSON.stringify(data);
+        $.ajaxSetup({
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+        });
+        $.ajax({
+            url: '/admin/index/update/'+ id_holl,
+            type: 'POST',
+            data: json_data,
+            contentType: 'application/json',
+            success: function(response) {
+                alert('Все удачно сохранено');
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('Ошибка: ' + textStatus + ' | ' + errorThrown);
+                console.log('Сообщение об ошибке: ' + jqXHR.responseJSON.message);
+            }
         });
       });
 
+      // Отправка в базу данных цен за место
+      $(".db_push_price").click(function(e) {
+        if (checkSell()) {
+          alert("Редактирование разрешено только после отключения продаж билетов");
+          return false;
+        }
+        e.preventDefault();
+        let id_holl = $('.standart-spot:visible').attr('prices-hall');
+        let standart = parseInt($('.standart-spot[prices-hall="'+id_holl+'"]').val());
+        let vip = parseInt($('.vip-spot[prices-hall="'+id_holl+'"]').val());
+        //Отправка данных в базу !!!
 
-      //Управление местами 
+        let data = ['price'];
+        data.push(standart);
+        data.push(vip);
+        let json_price = JSON.stringify(data);
+        $.ajaxSetup({
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+        });
+        $.ajax({
+            url: '/admin/index/update/'+ id_holl,
+            type: 'POST',
+            data: json_price,
+            contentType: 'application/json',
+            success: function(response) {
+                alert('Все удачно сохранено');
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('Ошибка: ' + textStatus + ' | ' + errorThrown);
+                console.log('Сообщение об ошибке: ' + jqXHR.responseJSON.message);
+            }
+        });
+      });
+
+      //Управление местами
       let chairClasses = ['conf-step__chair_disabled', 'conf-step__chair_standart', 'conf-step__chair_vip'];
       let chairIndex = 0;
       $('.conf-step__hall-wrapper').on('click', 'span.conf-step__chair', function() {
+        if (checkSell()) {
+          alert("Редактирование разрешено только после отключения продаж билетов");
+          return false;
+        }
         if ($(this).hasClass('conf-step__chair_vip')) {
           $(this).removeClass('conf-step__chair_vip');
           $(this).addClass('conf-step__chair_disabled');
@@ -540,16 +739,19 @@
 
       //Управление рядами
       $('input#rowsall').on('input', function(e) {
-        let rows = parseInt($('input#rowsall:first').val());
+        if (checkSell()) {
+          alert("Редактирование разрешено только после отключения продаж билетов");
+          return false;
+        }
+        let rows = parseInt($('input#rowsall[holl="'+e.target.attributes.holl.value+'"]').val());
         if (isNaN(rows)) {
           return;
         }
         if (rows < 1 || rows > 10) {
-          $('input#rowsall').attr('value', 8);
           alert('Количество рядов и мест в ряде должно быть от 5 до 10');
           return;
         }
-        let step = $('.conf-step__row[data-attribute="'+e.target.attributes.holl.value+'"]');
+        let step = $('.conf-step__row[holl="'+e.target.attributes.holl.value+'"]');
         let rowCount = step.length;
 
         if (rowCount < rows) {
@@ -557,13 +759,13 @@
             let countToAdd = parseInt(rows) - parseInt(rowCount);
 
             for (let i = 0; i < countToAdd; i++) {
-                lastRow.clone().appendTo('.conf-step__hall-wrapper');
+                lastRow.clone().appendTo('.conf-step__hall-wrapper[holl="'+e.target.attributes.holl.value+'"]');
             }
         } else if (rowCount > rows) {
             let countToRemove = parseInt(rowCount) - parseInt(rows);
 
             for (let i = 0; i < countToRemove; i++) {
-              $('.conf-step__hall-wrapper').children().last().remove();
+              $('.conf-step__hall-wrapper[holl="'+e.target.attributes.holl.value+'"]').children().last().remove();
             }
         }
         
@@ -571,20 +773,24 @@
 
       // управление местами в ряду
       $('input#seatsall').on('input', function(e) {
-        let seats = parseInt($('input#seatsall:last').val());
+        if (checkSell()) {
+          alert("Редактирование разрешено только после отключения продаж билетов");
+          return false;
+        }
+        let seats = parseInt($('input#seatsall[holl="'+e.target.attributes.holl.value+'"]').val());
         if (isNaN(seats)) {
           return;
         }
         if (seats < 1 || seats > 10) {
-          $('input#seatsall').attr('value', 8);
           alert('Количество рядов и мест в ряде должно быть от 5 до 10');
           return;
         }
 
-        let stepCheck = $('div.start_check span.conf-step__chair[data-attribute="'+e.target.attributes.holl.value+'"]');
-        let rowCount = stepCheck.length;
+        let stepCheck = $('div.start_check[holl="'+e.target.attributes.holl.value+'"]');
+        let children = stepCheck[0].children;
+        let rowCount = children.length;
 
-        let step = $('.conf-step__row');
+        let step = $('.conf-step__row[holl="'+e.target.attributes.holl.value+'"]');
         if (rowCount < seats) {
             let lastStep = step.children().last();
             let countToAdd = parseInt(seats) - parseInt(rowCount);
@@ -604,13 +810,17 @@
       });
       
       // Закрыть popup и фон при клике на крестик или вне popup
-      $(".popup__dismiss, #popup-bg").click(function(e) {
+      $(".popup__dismiss, .off-show, #popup-bg").click(function(e) {
         // Проверить, что клик был не внутри popup
+        e.preventDefault();
         if (e.currentTarget == this) {
           $(".popup, #popup-bg").hide();
         }
       });
     });
     </script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/sunny/jquery-ui.css">
 </body>
 </html>
