@@ -43,6 +43,7 @@
       </div>
       <div class="buying-scheme">
         <div class="buying-scheme__wrapper">
+          {{$a = 0}}
           @foreach ($cinemaHalls as $cinemaHall)
           
             @if ($cinemaHall->id == $holl_id_now)
@@ -54,23 +55,28 @@
                       $price_vip = $cinemaHall->price_per_vip_seat;
                     @endphp
                     <div class="buying-scheme__row">
+                      {{print_r($hallBuySpot)}}
                       @foreach ((array)$row as $key => $spot)
-                        <span check="true" 
-                                @if ($hallBuySpot == 0)
-                                    @if ($hallBuySpot['idMov'] == $session->movie_id && $hallBuySpot['idHall'] == $holl_id_now && $hallBuySpot['id_ses'] == $id_ses)    
-                                      @foreach ($hallBuySpot['data_row_spot'] as $itm)
-                                          @if ($itm[0]-1 == $keys && $itm[1]-1 == $key)
-                                            row="{{$keys+1}}" row_spot="{{$key+1}}" class="buying-scheme__chair buying-scheme__chair_taken"
-                                          @else
-                                            row="{{$keys+1}}" row_spot="{{$key+1}}" class="buying-scheme__chair buying-scheme__chair_{{ $spot[0] == 0 ? 'disabled' : ($spot[0] == 1 ? 'standart' : 'vip') }}"
-                                          @endif
-                                      @endforeach
-                                    @else
-                                    row="{{$keys+1}}" row_spot="{{$key+1}}" class="buying-scheme__chair buying-scheme__chair_{{ $spot[0] == 0 ? 'disabled' : ($spot[0] == 1 ? 'standart' : 'vip') }}"
-                                    @endif
-                                @else
-                                  row="{{$keys+1}}" row_spot="{{$key+1}}" class="buying-scheme__chair buying-scheme__chair_{{ $spot[0] == 0 ? 'disabled' : ($spot[0] == 1 ? 'standart' : 'vip') }}"
+                        <span 
+                          @if ($hallBuySpot != [])
+                            @foreach ($hallBuySpot as $itmTic)
+                                @if ($itmTic['idMov'] == $session->movie_id && $itmTic['id_ses'] == $id_ses)
+                                  {{$a = 0}}
+                                  @foreach ($itmTic['data_row_spot'] as $itm)
+                                      @if ($itm[0]-1 == $keys && $itm[1]-1 == $key)
+                                      {{$a = 1}}
+                                        row="{{$keys+1}}" row_spot="{{$key+1}}" class="buying-scheme__chair buying-scheme__chair_taken"
+                                        @break
+                                      @endif
+                                  @endforeach
                                 @endif
+                            @endforeach
+                            @if ($a == 0)
+                              check="true" row="{{$keys+1}}" row_spot="{{$key+1}}" class="buying-scheme__chair buying-scheme__chair_{{ $spot[0] == 0 ? 'disabled' : ($spot[0] == 1 ? 'standart' : 'vip') }}"
+                            @endif
+                          @else
+                          check="true" row="{{$keys+1}}" row_spot="{{$key+1}}" class="buying-scheme__chair buying-scheme__chair_{{ $spot[0] == 0 ? 'disabled' : ($spot[0] == 1 ? 'standart' : 'vip') }}"
+                          @endif
                         ></span>        
                       @endforeach
                     </div>
@@ -99,7 +105,7 @@
 <script defer>
   $(document).ready(function() {
     //Управление местами
-    $('.buying-scheme__row').on('click', 'span.buying-scheme__chair', function() {
+    $('.buying-scheme__row').on('click', 'span.buying-scheme__chair[check="true"]', function() {
       if ($(this).hasClass('buying-scheme__chair_selected')) {
         $(this).removeClass('buying-scheme__chair_selected');
       } else if (!$(this).hasClass('buying-scheme__chair_selected')) {

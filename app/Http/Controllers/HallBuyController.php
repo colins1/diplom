@@ -37,11 +37,13 @@ class HallBuyController extends Controller
             $ardecode[] = json_decode($cloneAr[$i], true);
         }
 
-        foreach ($ardecode as $key => $value) {
-            if ($value['idHall'] == $arrayIdAndTime[2]) {
-                $filteredArray = $value;
-            }else {
-                $filteredArray = 0;
+        $filteredArray = [];
+        
+        if (!empty($ardecode)) {
+            foreach ($ardecode as $key => $value) {
+                if ($value['idHall'] == $arrayIdAndTime[2]) {
+                    $filteredArray[] = $value;
+                }
             }
         }
 
