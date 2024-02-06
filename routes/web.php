@@ -7,6 +7,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\TicketsController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\HallBuyController;
+use App\Http\Controllers\PaymentController;
 
 use Carbon\Carbon;
 
@@ -47,6 +48,7 @@ Route::get('/', function () {
 Route::get('/', [IndexController::class, 'index']);
 Route::get('client/hall/{id_ses}', [HallBuyController::class, 'index'])->name('hall');
 Route::post('client/hall/buy', [HallBuyController::class, 'store']);
+Route::get('client/hall/payment/{id}', [PaymentController::class, 'index'])->name('payment');
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/admin/index', [FilmsController::class, 'index']);

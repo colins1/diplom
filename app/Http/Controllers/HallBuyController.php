@@ -105,6 +105,8 @@ class HallBuyController extends Controller
         $clone = array_values((array)$data);
         $hallBuy->json_data = $clone[11]; // Преобразуйте данные в JSON
         $hallBuy->save();
+
+        return $hallBuy->id;
         
         /*
         $hall = HallBuy::find($id);

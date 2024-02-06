@@ -165,7 +165,7 @@
           data: json_data,
           contentType: 'application/json',
           success: function(response) {
-            window.location.href = '/payment';
+            window.location.href = '/client/hall/payment/'+response;
           },
           error: function(jqXHR, textStatus, errorThrown) {
               console.log('Ошибка: ' + textStatus + ' | ' + errorThrown);
