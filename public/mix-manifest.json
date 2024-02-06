@@ -1,1 +1,5 @@
-{}
+{
+    "/css/normalize.css": "/css/normalize.css",
+    "/css/client/all2.css": "/css/client/all2.css",
+    "/css/admin/all.css": "/css/admin/all.css"
+}

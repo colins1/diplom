@@ -11,6 +11,13 @@ export default defineConfig({
             ],
             refresh: true,
         }),
+        vite({
+            input: [
+                'resources/sass/app.scss',
+                'resources/js/app.js',
+            ],
+            // Другие настройки...
+        }),
         vue({
             template: {
                 transformAssetUrls: {

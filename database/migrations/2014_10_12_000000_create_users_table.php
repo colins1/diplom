@@ -22,6 +22,12 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
+
+        DB::table('users')->insert([
+            'name' => 'maxim',
+            'email' => 'maxim@gmail.com',
+            'password' => bcrypt('qwerty'),
+        ]);
     }
 
     /**

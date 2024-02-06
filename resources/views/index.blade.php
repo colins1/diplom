@@ -6,9 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>ИдёмВКино</title>
-  <link rel="stylesheet" href="{{ asset('css/all.css') }}">
-  <link rel="stylesheet" href="{{ asset('css/normalize.css') }}">
-  <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/client/all2.css') }}">
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900&amp;subset=cyrillic,cyrillic-ext,latin-ext" rel="stylesheet">
 </head>
 
@@ -16,136 +14,100 @@
   <header class="page-header">
     <h1 class="page-header__title">Идём<span>в</span>кино</h1>
   </header>
+    @php
+        use Carbon\Carbon;
+
+        // Получаем текущую дату и время по московскому времени
+        $now = Carbon::now('Europe/Moscow');
+
+        // Создаем массив с днями недели, начиная с понедельника
+        $daysOfWeek = [];
+        $filmDay = $now->format('Y-m-d');
+        for ($i = 0; $i < 7; $i++) {
+            $day = $now->copy()->addDays($i);
+            if ($day->isToday()) {
+              $chek = 1;
+            } else {
+              $chek = 0;
+            }
+            $daysOfWeek[] = [
+                'date' => $day->format('Y-m-d'),
+                'dayOfWeek' => $day->formatLocalized('%a'), // Пн, Вт, Ср и т. д.
+                'dayOfMonth' => $day->day,
+                'isToday' => $chek,
+            ];
+        }
+        $daysOfWeeks = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    @endphp
+
+    <nav class="page-nav">
+      @foreach ($daysOfWeek as $key => $day)
+          <a date-film="{{ $day['date'] }}" class="page-nav__day @php echo $day['isToday'] == 1 ? 'page-nav__day_today page-nav__day_chosen': ''  @endphp" href="#">
+              <span class="page-nav__day-week">{{ $daysOfWeeks[$key] }}</span>
+              <span class="page-nav__day-number">{{ $day['dayOfMonth'] }}</span>
+          </a>
+      @endforeach
+    </nav>
   
-  <nav class="page-nav">
-    <a class="page-nav__day page-nav__day_today" href="#">
-      <span class="page-nav__day-week">Пн</span><span class="page-nav__day-number">31</span>
-    </a>
-    <a class="page-nav__day" href="#">
-      <span class="page-nav__day-week">Вт</span><span class="page-nav__day-number">1</span>
-    </a>
-    <a class="page-nav__day page-nav__day_chosen" href="#">
-      <span class="page-nav__day-week">Ср</span><span class="page-nav__day-number">2</span>
-    </a>
-    <a class="page-nav__day" href="#">
-      <span class="page-nav__day-week">Чт</span><span class="page-nav__day-number">3</span>
-    </a>
-    <a class="page-nav__day" href="#">
-      <span class="page-nav__day-week">Пт</span><span class="page-nav__day-number">4</span>
-    </a>
-    <a class="page-nav__day page-nav__day_weekend" href="#">
-      <span class="page-nav__day-week">Сб</span><span class="page-nav__day-number">5</span>
-    </a>
-    <a class="page-nav__day page-nav__day_next" href="#">
-    </a>
-  </nav>
   
   <main>
-    <section class="movie">
-      <div class="movie__info">
-        <div class="movie__poster">
-          <img class="movie__poster-image" alt="Звёздные войны постер" src="i/poster1.jpg">
+    @foreach ($cinema_all as $cinema)
+      <section class="movie">
+        <div class="movie__info">
+          <div class="movie__poster">
+            <img class="movie__poster-image" alt="Звёздные войны постер" src="{{$cinema->url_img}}">
+          </div>
+          <div class="movie__description">
+            <h2 class="movie__title">{{$cinema->name}}</h2>
+            <p class="movie__synopsis">{{$cinema->description}}</p>
+            <p class="movie__data">
+              <span class="movie__data-duration">{{$cinema->minutes}} минут</span>
+              <span class="movie__data-origin">{{$cinema->country}}</span>
+            </p>
+          </div>
         </div>
-        <div class="movie__description">
-          <h2 class="movie__title">Звёздные войны XXIII: Атака клонированных клонов</h2>
-          <p class="movie__synopsis">Две сотни лет назад малороссийские хутора разоряла шайка нехристей-ляхов во главе с могущественным колдуном.</p>
-          <p class="movie__data">
-            <span class="movie__data-duration">130 минут</span>
-            <span class="movie__data-origin">США</span>
-          </p>
+        @foreach ($cinemaHalls as $cinemaHall)
+        <div class="movie-seances__hall">
+          <h3 class="movie-seances__hall-title">Зал {{$cinemaHall->name}}</h3>
+          <ul class="movie-seances__list">
+            @foreach ($sessions as $session)
+              @if ($session->hall_id == $cinemaHall->id && $session->movie_id == $cinema->id)
+              <li class="movie-seances__time-block">
+                <a class="movie-seances__time" date-film="{{$filmDay}}" href="{{ route('hall', ['id_ses' => $session->id_ses.'_'.$filmDay.'_'.$cinemaHall->id]) }}">
+                    {{$session->time}}
+                </a>
+              </li>
+              @endif
+            @endforeach  
+          </ul>
         </div>
-      </div>  
-      
-      <div class="movie-seances__hall">
-        <h3 class="movie-seances__hall-title">Зал 1</h3>
-        <ul class="movie-seances__list">
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">10:20</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">14:10</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">18:40</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">22:00</a></li>
-        </ul>
-      </div>
-      <div class="movie-seances__hall">
-        <h3 class="movie-seances__hall-title">Зал 2</h3>
-        <ul class="movie-seances__list">
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">11:15</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">14:40</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">16:00</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">18:30</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">21:00</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">23:30</a></li>     
-        </ul>
-      </div>      
-    </section>
-    
-    <section class="movie">
-      <div class="movie__info">      
-        <div class="movie__poster">
-          <img class="movie__poster-image" alt="Альфа постер" src="i/poster2.jpg">
-        </div>
-        <div class="movie__description">        
-          <h2 class="movie__title">Альфа</h2>
-          <p class="movie__synopsis">20 тысяч лет назад Земля была холодным и неуютным местом, в котором смерть подстерегала человека на каждом шагу.</p>
-          <p class="movie__data">
-            <span class="movie__data-duration">96 минут</span>
-            <span class="movie__data-origin">Франция</span>
-          </p>
-        </div>    
-      </div>  
-      <div class="movie-seances__hall">
-        <h3 class="movie-seances__hall-title">Зал 1</h3>
-        <ul class="movie-seances__list">
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">10:20</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">14:10</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">18:40</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">22:00</a></li>
-        </ul>
-      </div>
-      <div class="movie-seances__hall">
-        <h3 class="movie-seances__hall-title">Зал 2</h3>
-        <ul class="movie-seances__list">
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">11:15</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">14:40</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">16:00</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">18:30</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">21:00</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">23:30</a></li>     
-        </ul>
-      </div>      
-    </section>   
-    
-    <section class="movie">
-      <div class="movie__info">      
-        <div class="movie__poster">
-          <img class="movie__poster-image" alt="Хищник постер" src="i/poster2.jpg">
-        </div>
-        <div class="movie__description">        
-          <h2 class="movie__title">Хищник</h2>
-          <p class="movie__synopsis">Самые опасные хищники Вселенной, прибыв из глубин космоса, высаживаются на улицах маленького городка, чтобы начать свою кровавую охоту. Генетически модернизировав себя с помощью ДНК других видов, охотники стали ещё сильнее, умнее и беспощаднее.</p>
-          <p class="movie__data">
-            <span class="movie__data-duration">101 минута</span>
-            <span class="movie__data-origin">Канада, США</span>
-          </p>
-        </div>    
-      </div>  
-      <div class="movie-seances__hall">
-        <h3 class="movie-seances__hall-title">Зал 1</h3>
-        <ul class="movie-seances__list">
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">09:00</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">10:10</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">12:55</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">14:15</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">14:50</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">16:30</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">18:00</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">18:50</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">19:50</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">20:55</a></li>
-          <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html">22:00</a></li>
-        </ul>
-      </div>     
-    </section>     
+        @endforeach   
+      </section>
+    @endforeach
   </main>
   
 </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script defer>
+  $(document).ready(function() {
+    // работа с page-nav__day_chosen
+    $('.page-nav__day').click(function(e) {
+      // Получаем значение атрибута .conf-step__radio
+      const allDayBlocks = $(".page-nav__day");
+
+      // Фильтровать только те, где есть класс page-nav__day_chosen
+      const chosenDayBlocks = allDayBlocks.filter(".page-nav__day_chosen");
+
+      // Удалить класс page-nav__day_chosen у найденных элементов
+      chosenDayBlocks.removeClass("page-nav__day_chosen");
+
+      // Добавить новый класс page-nav__day_chosen к $(this)
+      $(this).addClass("page-nav__day_chosen");
+      let dateFilmValue = $(this).attr("date-film");
+      $(".movie-seances__time").each(function() {
+          $(this).attr("date-film", dateFilmValue); // Здесь вы можете изменить значение атрибута date-film на нужное
+      });
+    });
+  });
+</script>
 </html>
