@@ -1,4 +1,4 @@
-"use strict"
+/*"use strict"
 
 // РџРѕРєР°Р· popup РѕРєРЅР° 
 function showPopup(url) {
@@ -130,3 +130,5 @@ function popupClose(event) {
   popup.remove();
   posterFile = "" // РћР±РЅСѓР»СЏРµРј РїРµСЂРµРјРµРЅРЅСѓСЋ С…СЂР°РЅСЏС‰СѓСЋ РёР·РѕР±СЂР°Р¶РµРЅРёРµ РїРѕСЃС‚РµСЂР° 
 }
+
+*/

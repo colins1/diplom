@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('hall_buys', function (Blueprint $table) {
             $table->id();
-            $table->text('json_data')->default(null);
+            $table->text('json_data')->nullable();
             $table->timestamps();
         });
     }

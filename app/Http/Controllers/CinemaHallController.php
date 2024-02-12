@@ -79,16 +79,15 @@ class CinemaHallController extends Controller
     public function update(Request $request, $id)
     {
         $hall = CinemaHall::find($id);
-        $array = [];
-        $clone = array_values((array)$request);
-        $check = json_decode($clone[11]); 
+        $check = $request->all();
         if ($check[0] == 'price') {
             $hall->price_per_regular_seat = $check[1];
             $hall->price_per_vip_seat = $check[2];
             $hall->save();
             return 'New Price';
         }
-        $hall->number_of_seats = $clone[11];
+        $check = json_encode($check); 
+        $hall->number_of_seats = $check;
         $hall->save();
         return 'New Spot';
     }

@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900&amp;subset=cyrillic,cyrillic-ext,latin-ext" rel="stylesheet">
 </head>
 <body>
-  <div id="popup-bg"></div>
+  <div id="popup-bgc"></div>
   <header class="page-header">
     <h1 class="page-header__title">Идём<span>в</span>кино</h1>
     <span class="page-header__subtitle">Администраторррская</span>
@@ -20,7 +20,7 @@
   
 
 <style>
-  #popup-bg {
+  #popup-bgc {
     /* Делаем его позицию фиксированной, чтобы он не зависел от прокрутки */
     position: fixed;
     /* Устанавливаем его размеры равными размерам экрана */
@@ -52,7 +52,7 @@
   }
 
   .conf-step__button-trash {
-    background-image: url("../client/i/trash-sprite.png");
+    background-image: url("../admin/i/trash-sprite.png");
     background-size: contain;
     border: none;
     background-size: cover;
@@ -66,7 +66,7 @@
             <div class="popup__header">
                 <h2 class="popup__title">
                     Добавление зала
-                    <a class="popup__dismiss" href="#"><img src="{{ asset('client/i/close.png') }}" alt="Закрыть" id="addModalDismiss"></a>
+                    <a class="popup__dismiss" href="#"><img src="{{ asset('admin/i/close.png') }}" alt="Закрыть" id="addModalDismiss"></a>
                 </h2>
 
             </div>
@@ -94,7 +94,7 @@
           <div class="popup__header">
               <h2 class="popup__title">
                   Удаление зала
-                  <a class="popup__dismiss" href="#"><img src="{{ asset('client/i/close.png') }}" alt="Закрыть" id="delModalDismiss"></a>
+                  <a class="popup__dismiss" href="#"><img src="{{ asset('admin/i/close.png') }}" alt="Закрыть" id="delModalDismiss"></a>
               </h2>
 
           </div>
@@ -118,41 +118,41 @@
 {{--Movie add Popup--}}
 <div class="popup" id="addMoviePopup">
   <div class="popup__container">
-      <div class="popup__content">
-          <div class="popup__header">
-              <h2 class="popup__title">
-                  Добавление фильма
-                  <a class="popup__dismiss" href="#"><img src="{{ asset('client/i/close.png') }}" alt="Закрыть" id="moviePopupDismiss"></a>
-              </h2>
-          </div>
-          <div class="popup__wrapper">
-              <form accept-charset="utf-8" enctype="multipart/form-data" id="addMovieForm" method="POST" action="{{ url('/admin/index/add_movie') }}">
-                  @csrf
-                  <label class="conf-step__label conf-step__label-fullsize" for="name">
-                      Название фильма
-                      <input class="conf-step__input" type="text" placeholder="Например, &laquo;Гражданин Кейн&raquo;" name="title" id="movieName" required>
-                  </label>
-                  <label class="conf-step__label conf-step__label-fullsize" for="name">
-                      Продолжительность фильма
-                      <input class="conf-step__input" type="text" placeholder="Например, &laquo;86&raquo;" name="duration" id="movieDuration" required>
-                  </label>
-                  <label class="conf-step__label conf-step__label-fullsize" for="name">
-                      Описание фильма
-                      <textarea class="conf-step__input" type="text" placeholder="Например, &laquo;Гражданин Кейн был бравым офицером и т.д и тп.&raquo;" name="description" id="movieDescription" required></textarea>
-                  </label>
-                  <label class="conf-step__label conf-step__label-fullsize" for="name">
-                      Страна
-                      <input class="conf-step__input" type="text" placeholder="Например, &laquo;Индия&raquo;" name="country" id="movieCountry" required>
-                  </label>
-                  <div class="conf-step__buttons text-center">
-                      <label for="addImg" class="conf-step__button conf-step__button-accent">Добавить Постер</label>
-                      <input type="file" id="addImg" name="addImg" style="display:none;">
-                      <input type="submit" value="Добавить фильм" class="conf-step__button conf-step__button-accent" id="addMovieToDbBtn">
-                      <button class="conf-step__button conf-step__button-regular off-show">Отменить</button>
-                  </div>
-              </form>
-          </div>
+    <div class="popup__content">
+      <div class="popup__header">
+        <h2 class="popup__title">
+            Добавление фильма
+            <a class="popup__dismiss" href="#"><img src="{{ asset('admin/i/close.png') }}" alt="Закрыть" id="moviePopupDismiss"></a>
+        </h2>
       </div>
+      <div class="popup__wrapper">
+        <form accept-charset="utf-8" enctype="multipart/form-data" id="addMovieForm" method="POST" action="{{ url('/admin/index/add_movie') }}">
+          @csrf
+          <label class="conf-step__label conf-step__label-fullsize" for="name">
+              Название фильма
+              <input class="conf-step__input" type="text" placeholder="Например, &laquo;Гражданин Кейн&raquo;" name="title" id="movieName" required>
+          </label>
+          <label class="conf-step__label conf-step__label-fullsize" for="name">
+              Продолжительность фильма
+              <input class="conf-step__input" type="text" placeholder="Например, &laquo;86&raquo;" name="duration" id="movieDuration" required>
+          </label>
+          <label class="conf-step__label conf-step__label-fullsize" for="name">
+              Описание фильма
+              <textarea class="conf-step__input" type="text" placeholder="Например, &laquo;Гражданин Кейн был бравым офицером и т.д и тп.&raquo;" name="description" id="movieDescription" required></textarea>
+          </label>
+          <label class="conf-step__label conf-step__label-fullsize" for="name">
+              Страна
+              <input class="conf-step__input" type="text" placeholder="Например, &laquo;Индия&raquo;" name="country" id="movieCountry" required>
+          </label>
+          <div class="conf-step__buttons text-center">
+            <label for="addImg" class="conf-step__button conf-step__button-accent">Добавить Постер</label>
+            <input type="file" id="addImg" name="addImg" style="display:none;">
+            <input type="submit" value="Добавить фильм" class="conf-step__button conf-step__button-accent" id="addMovieToDbBtn">
+            <button class="conf-step__button conf-step__button-regular off-show">Отменить</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -161,43 +161,41 @@
 {{--ShowTime add--}}
 <div class="popup" id="addShowTimePopup">
   <div class="popup__container">
-      <div class="popup__content">
-          <div class="popup__header">
-              <h2 class="popup__title">
-                  Добавление сеанса
-                  <a class="popup__dismiss" href="#"><img src="{{ asset('client/i/close.png') }}" alt="Закрыть" id="showTimePopupDismiss"></a>
-              </h2>
-
-          </div>
-          <div class="popup__wrapper">
-              <form accept-charset="utf-8" method="POST" id="seanceAddForm" >
-                  @csrf
-                  <label class="conf-step__label conf-step__label-fullsize" for="hall_id">
-                      Название зала
-                      <select class="conf-step__input" name="hall_id" id="seance_hallName" required>
-                          @foreach($cinemaHalls as $cinemaHall)
-                          <option value="{{ $cinemaHall->id }}" class="chois-id">{{ $cinemaHall->name }}</option>
-                          @endforeach
-                      </select>
-                  </label>
-                  <label class="conf-step__label conf-step__label-fullsize" for="name">
-                      Время начала
-                      <input class="conf-step__input" type="time" min="10:00" max="22:00" name="start_time" id="seance_startTime" required>
-                  </label>
-                  <label class="conf-step__label conf-step__label-fullsize" for="movie_id">
-                      Название фильма
-                      <select class="conf-step__input" name="movie_id" id="seance_movieName" required>
-                        <option value="" class="movie_id"></option>
-                      </select>
-                  </label>
-
-                  <div class="conf-step__buttons text-center">
-                      <input type="submit" value="Добавить" class="add-mov-seans conf-step__button conf-step__button-accent">
-                      <button class="conf-step__button conf-step__button-regular off-show">Отменить</button>
-                  </div>
-              </form>
-          </div>
+    <div class="popup__content">
+      <div class="popup__header">
+        <h2 class="popup__title">
+          Добавление сеанса
+          <a class="popup__dismiss" href="#"><img src="{{ asset('admin/i/close.png') }}" alt="Закрыть" id="showTimePopupDismiss"></a>
+        </h2>
       </div>
+      <div class="popup__wrapper">
+        <form accept-charset="utf-8" method="POST" id="seanceAddForm" >
+          @csrf
+          <label class="conf-step__label conf-step__label-fullsize" for="hall_id">
+          Название зала
+            <select class="conf-step__input" name="hall_id" id="seance_hallName" required>
+              @foreach($cinemaHalls as $cinemaHall)
+                <option value="{{ $cinemaHall->id }}" class="chois-id">{{ $cinemaHall->name }}</option>
+              @endforeach
+            </select>
+          </label>
+          <label class="conf-step__label conf-step__label-fullsize" for="name">
+            Время начала
+            <input class="conf-step__input" type="time" min="10:00" max="22:00" name="start_time" id="seance_startTime" required>
+          </label>
+          <label class="conf-step__label conf-step__label-fullsize" for="movie_id">
+          Название фильма
+            <select class="conf-step__input" name="movie_id" id="seance_movieName" required>
+              <option value="" class="movie_id"></option>
+            </select>
+          </label>
+          <div class="conf-step__buttons text-center">
+            <input type="submit" value="Добавить" class="add-mov-seans conf-step__button conf-step__button-accent">
+            <button class="conf-step__button conf-step__button-regular off-show">Отменить</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -208,7 +206,7 @@
           <div class="popup__header">
               <h2 class="popup__title">
                   Снятие с сеанса
-                  <a class="popup__dismiss" href="#"><img src="{{ asset('client/i/close.png') }}" alt="Закрыть" id="delShowTimePopupDismiss"></a>
+                  <a class="popup__dismiss" href="#"><img src="{{ asset('admin/i/close.png') }}" alt="Закрыть" id="delShowTimePopupDismiss"></a>
               </h2>
 
           </div>
@@ -266,9 +264,9 @@
                                     @else 
                                     style="display: none;"
                                     @endif>
-            <label class="conf-step__label">Рядов, шт<input holl="{{$cinemaHall->id}}" id="rowsall" type="number" class="conf-step__input" placeholder="10" ></label>
+            <label class="conf-step__label">Рядов, шт<input holl="{{$cinemaHall->id}}" type="number" class="rowsall conf-step__input" placeholder="10" ></label>
             <span class="multiplier">x</span>
-            <label class="conf-step__label">Мест, шт<input holl="{{$cinemaHall->id}}" id="seatsall" type="number" class="conf-step__input" placeholder="8" ></label>
+            <label class="conf-step__label">Мест, шт<input holl="{{$cinemaHall->id}}" type="number" class="seatsall conf-step__input" placeholder="8" ></label>
           </div>
         @endforeach
         <p class="conf-step__paragraph">Теперь вы можете указать типы кресел на схеме зала:</p>
@@ -446,10 +444,9 @@
   </main>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script src="{{ asset('js/accordeon.js') }}"></script>
-  <script src="{{ asset('js/admin_editor.js') }}"></script>
 
 
-  <script>
+  <script defer>
     $(document).ready(function() {
 
       function checkSell() {
@@ -523,7 +520,7 @@
     }
 
       // Скрыть popup и фон по умолчанию
-      $(".popup, #popup-bg").hide();
+      $(".popup, #popup-bgc").hide();
 
       $('.conf-step__movie-poster').draggable({
           revert: true
@@ -563,7 +560,7 @@
               $('.add-mov-seans').attr("id-holl-sessia", idHollSessia);
               $('#seanceAddForm').attr("action", '/admin/index/seans');
               $("#addShowTimePopup").show();
-              $("#popup-bg").show();
+              $("#popup-bgc").show();
           }
       });
       
@@ -577,7 +574,7 @@
         let length = classList.length;
         lastClass = classList[length - 1];
         idDel = classList[length - 2];
-        $("#"+lastClass+", #popup-bg").show();
+        $("#"+lastClass+", #popup-bgc").show();
         let id = event.currentTarget.attributes.idattr.value;
         if (id) {
           let act = '\/admin\/index\/holls\/'+id;
@@ -737,12 +734,12 @@
       });
 
       //Управление рядами
-      $('input#rowsall').on('input', function(e) {
+      $('input.rowsall').on('input', function(e) {
         if (checkSell()) {
           alert("Редактирование разрешено только после отключения продаж билетов");
           return false;
         }
-        let rows = parseInt($('input#rowsall[holl="'+e.target.attributes.holl.value+'"]').val());
+        let rows = parseInt($('input.rowsall[holl="'+e.target.attributes.holl.value+'"]').val());
         if (isNaN(rows)) {
           return;
         }
@@ -771,12 +768,12 @@
       });
 
       // управление местами в ряду
-      $('input#seatsall').on('input', function(e) {
+      $('input.seatsall').on('input', function(e) {
         if (checkSell()) {
           alert("Редактирование разрешено только после отключения продаж билетов");
           return false;
         }
-        let seats = parseInt($('input#seatsall[holl="'+e.target.attributes.holl.value+'"]').val());
+        let seats = parseInt($('input.seatsall[holl="'+e.target.attributes.holl.value+'"]').val());
         if (isNaN(seats)) {
           return;
         }
@@ -809,17 +806,17 @@
       });
       
       // Закрыть popup и фон при клике на крестик или вне popup
-      $(".popup__dismiss, .off-show, #popup-bg").click(function(e) {
+      $(".popup__dismiss, .off-show, #popup-bgc").click(function(e) {
         // Проверить, что клик был не внутри popup
         e.preventDefault();
         if (e.currentTarget == this) {
-          $(".popup, #popup-bg").hide();
+          $(".popup, #popup-bgc").hide();
         }
       });
     });
     </script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>
-    <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/sunny/jquery-ui.css">
+
 </body>
 </html>

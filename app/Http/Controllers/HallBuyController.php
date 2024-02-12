@@ -99,29 +99,14 @@ class HallBuyController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $data)
+    public function store(Request $request)
     {
         $hallBuy = new HallBuy;
-        $clone = array_values((array)$data);
-        $hallBuy->json_data = $clone[11]; // Преобразуйте данные в JSON
+        $check = $request->all();
+        $check = json_encode($check);
+        $hallBuy->json_data = $check; // Преобразуйте данные в JSON
         $hallBuy->save();
-
         return $hallBuy->id;
-        
-        /*
-        $hall = HallBuy::find($id);
-        $array = [];
-        $clone = array_values((array)$request);
-        $check = json_decode($clone[11]); 
-        if ($check[0] == 'price') {
-            $hall->price_per_regular_seat = $check[1];
-            $hall->price_per_vip_seat = $check[2];
-            $hall->save();
-            return 'New Price';
-        }
-        $hall->number_of_seats = $clone[11];
-        $hall->save();
-        return 'New Spot';*/
     }
 
     /**

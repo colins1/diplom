@@ -55,12 +55,11 @@
                       $price_vip = $cinemaHall->price_per_vip_seat;
                     @endphp
                     <div class="buying-scheme__row">
-                      {{print_r($hallBuySpot)}}
                       @foreach ((array)$row as $key => $spot)
                         <span 
                           @if ($hallBuySpot != [])
                             @foreach ($hallBuySpot as $itmTic)
-                                @if ($itmTic['idMov'] == $session->movie_id && $itmTic['id_ses'] == $id_ses)
+                                @if ($itmTic['idMov'] == $session->movie_id && $itmTic['id_ses'] == $id_ses && $timeToDay == $itmTic['timeToDays'])
                                   {{$a = 0}}
                                   @foreach ($itmTic['data_row_spot'] as $itm)
                                       @if ($itm[0]-1 == $keys && $itm[1]-1 == $key)

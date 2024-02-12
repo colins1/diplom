@@ -7,6 +7,7 @@ use App\Models\Tickets;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 
 
 class FilmsController extends Controller
@@ -39,29 +40,39 @@ class FilmsController extends Controller
      */
     public function store(Request $request)
     {
-        $title = $request->input('title');
-        $duration = $request->input('duration');
-        $description = $request->input('description');
-        $country = $request->input('country');
-
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|max:50',
+            'duration' => 'required|integer|min:1',
+            'description' => 'required',
+            'country' => 'required|max:50',
+            'addImg' => 'image|mimes:jpeg,png|max:2048',
+        ]);
+    
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+    
         $movie = new Films;
-        $movie->name = $title;
-        $movie->minutes = $duration;
-        $movie->description = $description;
-        $movie->country = $country;
+        $movie->name = $request->input('title');
+        $movie->minutes = $request->input('duration');
+        $movie->description = $request->input('description');
+        $movie->country = $request->input('country');
+    
         if ($request->hasFile('addImg')) {
             $file = $request->file('addImg');
             $destinationPath = 'i';
-            $fileName = $file->getClientOriginalName();
-            $fileName = Str::random(15) . '.' . htmlspecialchars($fileName);
+            $fileName = Str::random(15) . '.' . $file->getClientOriginalExtension();
             $file->move($destinationPath, $fileName);
             $filePath = $destinationPath . '/' . $fileName;
             $movie->url_img = $filePath;
         } else {
             $movie->url_img = 'no_img';
         }
+    
         $movie->save();
-
+    
         return redirect('/admin/index')->with('success', 'Все успешно');
     }
 

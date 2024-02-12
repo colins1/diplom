@@ -39,7 +39,6 @@
         }
         $daysOfWeeks = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
     @endphp
-
     <nav class="page-nav">
       @foreach ($daysOfWeek as $key => $day)
           <a date-film="{{ $day['date'] }}" class="page-nav__day @php echo $day['isToday'] == 1 ? 'page-nav__day_today page-nav__day_chosen': ''  @endphp" href="#">
@@ -73,7 +72,7 @@
             @foreach ($sessions as $session)
               @if ($session->hall_id == $cinemaHall->id && $session->movie_id == $cinema->id)
               <li class="movie-seances__time-block">
-                <a class="movie-seances__time" date-film="{{$filmDay}}" href="{{ route('hall', ['id_ses' => $session->id_ses.'_'.$filmDay.'_'.$cinemaHall->id]) }}">
+                <a class="movie-seances__time" date-film="{{$filmDay}}" id_holl="{{$cinemaHall->id}}" id_mov="{{$cinema->id}}" href="{{ route('hall', ['id_ses' => $session->id_ses.'_'.$filmDay.'_'.$cinemaHall->id]) }}">
                     {{$session->time}}
                 </a>
               </li>
@@ -105,7 +104,10 @@
       $(this).addClass("page-nav__day_chosen");
       let dateFilmValue = $(this).attr("date-film");
       $(".movie-seances__time").each(function() {
-          $(this).attr("date-film", dateFilmValue); // Здесь вы можете изменить значение атрибута date-film на нужное
+          let holl = $(this).attr("id_holl");
+          let mov = $(this).attr("id_mov");
+          $(this).attr("date-film", dateFilmValue);
+          $(this).attr("href", '../client/hall/'+mov+'_'+dateFilmValue+'_'+holl); // Здесь вы можете изменить значение атрибута date-film на нужное
       });
     });
   });

@@ -16,13 +16,13 @@ return new class extends Migration
         Schema::create('cinema_halls', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('hall_number')->nullable()->default(null);
-            $table->json('number_of_seats')->default('');
-            $table->integer('price_per_regular_seat')->nullable()->default(null);
-            $table->integer('price_per_vip_seat')->nullable()->default(null);
-            $table->integer('vip_seats')->nullable()->default(null);
-            $table->integer('unavailable_seats')->nullable()->default(null);
-            $table->integer('session_show')->default(0);
+            $table->unsignedInteger('hall_number')->nullable();
+            $table->json('number_of_seats')->nullable();
+            $table->unsignedInteger('price_per_regular_seat')->nullable();
+            $table->unsignedInteger('price_per_vip_seat')->nullable();
+            $table->unsignedInteger('vip_seats')->nullable();
+            $table->unsignedInteger('unavailable_seats')->nullable();
+            $table->unsignedInteger('session_show')->nullable();
             $table->timestamps();
         });
     }

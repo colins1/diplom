@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->integer('is_available')->default(0); // создаем булевый столбец с значением по умолчанию 0
+            $table->unsignedInteger('is_available')->nullable();
             $table->timestamps();
         });
 

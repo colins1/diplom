@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::create('films', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->default('');
-            $table->string('description')->default('');
-            $table->string('country')->default('');
-            $table->string('url_img')->default('');
-            $table->integer('minutes');
+            $table->string('name')->nullable();
+            $table->string('description')->nullable();
+            $table->string('country')->nullable();
+            $table->string('url_img')->nullable();
+            $table->unsignedInteger('minutes');
             $table->timestamps();
         });
     }
