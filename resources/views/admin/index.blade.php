@@ -360,6 +360,7 @@
         <p class="conf-step__paragraph">
           <button class="show-popup conf-step__button conf-step__button-accent button__add-movie addMoviePopup">Добавить фильм</button>
         </p>
+        <h3 style="color: red;">Перетащите фотографию фильма в сетку сеанса чтобы добавить фильм</h3>
         <div class="conf-step__movies">
           @foreach ($cinema_all as $cinema)
             <div class="conf-step__movie">
